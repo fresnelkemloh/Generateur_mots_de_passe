@@ -1,3 +1,8 @@
+from math import radians
+from random import randint
+from shlex import join
+
+
 class PasswordGenerator:
     MINISCULES= "abcdefghijklmnopqrstuvwxyz"
     MAJUSCULES = MINISCULES.upper()
@@ -80,3 +85,31 @@ class PasswordGenerator:
         if not isinstance(valeur, bool):
             raise TypeError("valider doit etre un bool")
         self.valider = valeur
+
+    def _ensemble_caractere(self) -> list[str]:
+        ensemble_caractere = []
+        if self.avec_minuscules:
+            ensemble_caractere.append(self.MINISCULES)
+        if self.avec_majuscules:
+            ensemble_caractere.append(self.MAJUSCULES)
+        if self.avec_chiffres:
+            ensemble_caractere.append(self.CHIFFRES)
+        if self.avec_symboles:
+            ensemble_caractere.append(self.SYMBOLES)
+        return ensemble_caractere
+
+    def _prendre_caractere(self, caractere:str) -> str:
+        return caractere[randint(0,len(caractere)-1)]
+
+    def _faire_mot_de_passe(self, tout_caractere:str) -> str:
+        return  "".join([self._prendre_caractere(tout_caractere)for i in range(self.longueur)])
+
+    def _tous_les_types(self,mot_de_passe:str, ensembles: list[str]) -> bool:
+        for ensemble in ensembles:
+            trouver = False
+            for caractere in mot_de_passe:
+                if caractere in ensemble:
+                    trouver = True
+                if not trouver:
+                    return False
+            return True
