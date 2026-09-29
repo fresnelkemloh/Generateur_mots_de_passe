@@ -26,7 +26,7 @@ class PasswordGenerator:
 
     @property
     def longueur(self) -> int:
-        return self.longueur
+        return self._longueur
     @longueur.setter
 
     def longueur(self, valeur:int) -> None:
@@ -34,7 +34,7 @@ class PasswordGenerator:
           raise TypeError("la longuer doit etre un entier")
       if valeur <= 0:
           raise ValueError("la longuer doit etre plus grand que 0")
-      self.longueur = valeur
+      self._longueur = valeur
 
     @property
     def avec_minuscules(self) -> bool:
@@ -102,7 +102,7 @@ class PasswordGenerator:
         return caractere[randint(0,len(caractere)-1)]
 
     def _faire_mot_de_passe(self, tout_caractere:str) -> str:
-        return  "".join([self._prendre_caractere(tout_caractere)for i in range(self.longueur)])
+        return  "".join([self._prendre_caractere(tout_caractere)for _ in range(self.longueur)])
 
     def _tous_les_types(self,mot_de_passe:str, ensembles: list[str]) -> bool:
         for ensemble in ensembles:
@@ -110,6 +110,18 @@ class PasswordGenerator:
             for caractere in mot_de_passe:
                 if caractere in ensemble:
                     trouver = True
-                if not trouver:
+            if not trouver:
                     return False
-            return True
+        return True
+
+    def generer_mot_de_passe(self) -> str:
+        ensembles = self._ensemble_caractere()
+        if len(ensembles) == 0:
+            raise ValueError("Au moins un type de caractere doit etre selectionne")
+        if self.valider and self.longueur < len(ensembles) :
+            raise ValueError(f"La longueur ({self.longueur}) est trop courte pour avoir un caractere de chaque type.")
+        tout_caractere = "".join(ensembles)
+        mot_de_passe = self._faire_mot_de_passe(tout_caractere)
+        while self.valider and not self._tous_les_types(mot_de_passe, ensembles):
+            mot_de_passe = self._faire_mot_de_passe(tout_caractere)
+        return mot_de_passe
