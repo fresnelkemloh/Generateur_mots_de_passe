@@ -10,12 +10,12 @@ class PasswordGenerator:
     SYMBOLES = "!@#$%^&*()-_=+[]{};:,.?/"
 
     def __init__(self, longueur:int=16, avec_minuscules:bool = True, avec_majuscules:bool = True,avec_chiffres:bool = True, avec_symboles:bool = True, valider:bool = False):
-        self.longueur = None
-        self.avec_minuscules = None
-        self.avec_majuscules = None
-        self.avec_chiffres = None
-        self.avec_symboles = None
-        self.valider = None
+        self._longueur = None
+        self._avec_minuscules = None
+        self._avec_majuscules = None
+        self._avec_chiffres = None
+        self._avec_symboles = None
+        self._valider = None
 
         self.longueur = longueur
         self.avec_minuscules = avec_minuscules
@@ -38,53 +38,53 @@ class PasswordGenerator:
 
     @property
     def avec_minuscules(self) -> bool:
-        return self.avec_minuscules
+        return self._avec_minuscules
     @avec_minuscules.setter
 
     def avec_minuscules(self, valeur:bool) -> None:
         if not isinstance(valeur, bool):
             raise TypeError("avec-minuscules doit etre un bool")
-        self.avec_minuscules = valeur
+        self._avec_minuscules = valeur
 
     @property
     def avec_majuscules(self) -> bool:
-        return self.avec_majuscules
+        return self._avec_majuscules
     @avec_majuscules.setter
 
     def avec_majuscules(self, valeur:bool) -> None:
         if not isinstance(valeur, bool):
             raise TypeError("avec-majuscules doit etre un bool")
-        self.avec_majuscules = valeur
+        self._avec_majuscules = valeur
 
     @property
     def avec_chiffres(self) -> bool:
-        return self.avec_chiffres
+        return self._avec_chiffres
     @avec_chiffres.setter
 
     def avec_chiffres(self, valeur:bool) -> None:
         if not isinstance(valeur, bool):
             raise TypeError("avec-chiffres doit etre un bool")
-        self.avec_chiffres = valeur
+        self._avec_chiffres = valeur
 
     @property
     def avec_symboles(self) -> bool:
-        return self.avec_symboles
+        return self._avec_symboles
     @avec_symboles.setter
 
     def avec_symboles(self, valeur:bool) -> None:
         if not isinstance(valeur, bool):
             raise TypeError("avec-symboles doit etre un bool")
-        self.avec_symboles = valeur
+        self._avec_symboles = valeur
 
     @property
     def valider(self) -> bool:
-        return self.valider
+        return self._valider
     @valider.setter
 
     def valider(self, valeur:bool) -> None:
         if not isinstance(valeur, bool):
             raise TypeError("valider doit etre un bool")
-        self.valider = valeur
+        self._valider = valeur
 
     def _ensemble_caractere(self) -> list[str]:
         ensemble_caractere = []
