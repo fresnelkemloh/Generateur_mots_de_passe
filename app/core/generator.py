@@ -1,7 +1,7 @@
 from math import radians
 from random import randint
 from shlex import join
-
+""" Logique je generation de mots de passe """
 
 class PasswordGenerator:
     MINISCULES= "abcdefghijklmnopqrstuvwxyz"
@@ -26,10 +26,12 @@ class PasswordGenerator:
 
     @property
     def longueur(self) -> int:
+        """Retourne la longueur du mots de passe"""
         return self._longueur
     @longueur.setter
 
     def longueur(self, valeur:int) -> None:
+        # Defini la longueur du mots de passe , entier > 0
       if not isinstance(valeur, int) or isinstance(valeur, bool):
           raise TypeError("la longuer doit etre un entier")
       if valeur <= 0:
@@ -38,6 +40,7 @@ class PasswordGenerator:
 
     @property
     def avec_minuscules(self) -> bool:
+        """Indique si les minuscules sont inscluses"""
         return self._avec_minuscules
     @avec_minuscules.setter
 
@@ -48,6 +51,7 @@ class PasswordGenerator:
 
     @property
     def avec_majuscules(self) -> bool:
+        """Indique si les majuscules sont inscluses"""
         return self._avec_majuscules
     @avec_majuscules.setter
 
@@ -58,6 +62,7 @@ class PasswordGenerator:
 
     @property
     def avec_chiffres(self) -> bool:
+        """Indique si les chiffres sont insclus"""
         return self._avec_chiffres
     @avec_chiffres.setter
 
@@ -68,6 +73,7 @@ class PasswordGenerator:
 
     @property
     def avec_symboles(self) -> bool:
+        """Indique si les symboles sont insclus"""
         return self._avec_symboles
     @avec_symboles.setter
 
@@ -78,6 +84,7 @@ class PasswordGenerator:
 
     @property
     def valider(self) -> bool:
+        """Indique si on force au moins un caractère de chaque type sélectionné."""
         return self._valider
     @valider.setter
 
@@ -87,6 +94,7 @@ class PasswordGenerator:
         self._valider = valeur
 
     def _ensemble_caractere(self) -> list[str]:
+        """retourne la liste des ensembles de caractères sélectionnés."""
         ensemble_caractere = []
         if self.avec_minuscules:
             ensemble_caractere.append(self.MINISCULES)
@@ -99,12 +107,15 @@ class PasswordGenerator:
         return ensemble_caractere
 
     def _prendre_caractere(self, caractere:str) -> str:
+        """retourne un caractère au hasard dans la chaîne reçue."""
         return caractere[randint(0,len(caractere)-1)]
 
     def _faire_mot_de_passe(self, tout_caractere:str) -> str:
+        """construit un mot de passe aléatoire en fonction de la longueur"""
         return  "".join([self._prendre_caractere(tout_caractere)for _ in range(self.longueur)])
 
     def _tous_les_types(self,mot_de_passe:str, ensembles: list[str]) -> bool:
+        """vérifie qu'il y a au moins un caractère de chaque ensemble."""
         for ensemble in ensembles:
             trouver = False
             for caractere in mot_de_passe:
@@ -115,6 +126,7 @@ class PasswordGenerator:
         return True
 
     def generer_mot_de_passe(self) -> str:
+        """Génère un mot de passe en fonction des parametre"""
         ensembles = self._ensemble_caractere()
         if len(ensembles) == 0:
             raise ValueError("Au moins un type de caractere doit etre selectionne")
@@ -125,3 +137,10 @@ class PasswordGenerator:
         while self.valider and not self._tous_les_types(mot_de_passe, ensembles):
             mot_de_passe = self._faire_mot_de_passe(tout_caractere)
         return mot_de_passe
+
+    def __repr__(self) -> str:
+        return ( f"PasswordGenerator(longueur={self.longueur},"
+                 f"avec_minuscules={self.avec_minuscules},"
+                 f"avec_majuscules={self.avec_majuscules},"
+                 f"avec_chiffres={self.avec_chiffres},"
+                 f"avec_symboles={self.avec_symboles}, valider={self.valider})")

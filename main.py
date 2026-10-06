@@ -1,8 +1,9 @@
 import argparse
-
+"""Configuration CLI"""
 from app.core.generator import PasswordGenerator
 
 def configurer_cli() -> argparse.ArgumentParser:
+    """Construit le parseur d'arguments de la ligne de commande"""
     parser = argparse.ArgumentParser(description="Genere mots de passe")
     parser.add_argument("--length",type=int,default=16,help="longueur mots de passe 16 par defaut")
     parser.add_argument("--no-lower",action="store_true", help="pas de lettre minuscules")
@@ -13,6 +14,7 @@ def configurer_cli() -> argparse.ArgumentParser:
     return parser
 
 def main():
+    """Point d'entrée du mode CLI"""
     parser = configurer_cli()
     args = parser.parse_args()
 
