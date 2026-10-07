@@ -1,13 +1,10 @@
 #Fresnel foguimgang kemloh, 2440103, fresnelkemloh
-from math import radians
-
 from random import randint
-from shlex import join
 """ Logique je generation de mots de passe """
 
 class PasswordGenerator:
-    MINISCULES= "abcdefghijklmnopqrstuvwxyz"
-    MAJUSCULES = MINISCULES.upper()
+    MINUSCULES= "abcdefghijklmnopqrstuvwxyz"
+    MAJUSCULES = MINUSCULES.upper()
     CHIFFRES = "0123456789"
     SYMBOLES = "!@#$%^&*()-_=+[]{};:,.?/"
 
@@ -99,7 +96,7 @@ class PasswordGenerator:
         """retourne la liste des ensembles de caractères sélectionnés."""
         ensemble_caractere = []
         if self.avec_minuscules:
-            ensemble_caractere.append(self.MINISCULES)
+            ensemble_caractere.append(self.MINUSCULES)
         if self.avec_majuscules:
             ensemble_caractere.append(self.MAJUSCULES)
         if self.avec_chiffres:
