@@ -1,6 +1,6 @@
 #Fresnel foguimgang kemloh, 2440103, fresnelkemloh
 from random import randint
-""" Logique je generation de mots de passe """
+""" Logique de generation de mots de passe """
 
 class PasswordGenerator:
     MINUSCULES= "abcdefghijklmnopqrstuvwxyz"
