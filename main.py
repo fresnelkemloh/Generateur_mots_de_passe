@@ -1,3 +1,4 @@
+#Fresnel foguimgang kemloh, 2440103, fresnelkemloh
 import argparse
 """Configuration CLI"""
 from app.core.generator import PasswordGenerator

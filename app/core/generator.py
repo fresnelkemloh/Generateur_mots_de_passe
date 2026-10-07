@@ -1,4 +1,6 @@
+#Fresnel foguimgang kemloh, 2440103, fresnelkemloh
 from math import radians
+
 from random import randint
 from shlex import join
 """ Logique je generation de mots de passe """
