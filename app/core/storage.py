@@ -82,6 +82,29 @@ class Coffre:
     def trier_par_mail(self) -> None:
         self._entrees = sorted(self._entrees, key=lambda entree: entree.email.lower())
 
+    def charger(self) -> None:
+        try:
+            with open(self._chemin_du_fichier, "r", encoding="utf-8") as fichier:
+                data = json.load(fichier)
+        except FileNotFoundError:
+            self._entrees = []
+            return
+        except json.JSONDecodeError as erreur:
+            raise FichierCoffreInvalideError(self.chemin_du_fichier, f"json non lisible{erreur}")
+        if not isinstance(data, list):
+            raise FichierCoffreInvalideError(self.chemin_du_fichier, f"une liste d'entree devrai y etre")
+        entrees_lu = []
+        for entree in data:
+            if not isinstance(entree, dict):
+                raise FichierCoffreInvalideError(self.chemin_du_fichier, "chaque fichier doit etre un object")
+            if "email" not in entree or "password" not in entree:
+                raise FichierCoffreInvalideError(self.chemin_du_fichier, "le champs email ou password est vide")
+            try:
+                entrees_lu.append(Entree.from_dict(entree))
+            except (ValueError, TypeError) as erreur:
+                raise FichierCoffreInvalideError(self.chemin_du_fichier, str(erreur))
+        self._entrees = entrees_lu
+
     def sauvegarder(self) -> None:
         data = [entree.to_dict() for entree in self._entrees]
         with open(self._chemin_du_fichier, "w", encoding="utf-8") as fichier:
