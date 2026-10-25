@@ -4,15 +4,15 @@ import json
 
 class FichierCoffreInvalideError(ValueError):
 
-    def __init__(self, message:str ,chemin:str):
+    def __init__(self,chemin:str, message:str):
         self.chemin = chemin
         super().__init__(f"fichier {chemin} invalide {message}")
 
 class Entree:
 
     def __init__(self, email:str, password:str):
-        self.email = None
-        self.password = None
+        self._email = None
+        self._password = None
 
         self.email = email
         self.password = password

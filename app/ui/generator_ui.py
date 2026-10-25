@@ -27,7 +27,7 @@ class FenetreGenerator(QDialog):
     def init_ui(self) -> None:
         layout = QVBoxLayout()
 
-        layout.addChildWidget(QLabel("Longueur"))
+        layout.addWidget(QLabel("Longueur"))
         longueur_layout = QHBoxLayout()
 
         self.bouton_moins = QPushButton("-")
