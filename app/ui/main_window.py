@@ -52,6 +52,10 @@ class LigneListe(QtWidgets.QWidget):
         self.mettre_a_jour_affichage()
         super().mouseDoubleClickEvent(event)
 
+    @property
+    def email(self) -> str:
+        return self._entree.email
+
 class FenetreSetUpEntree(QtWidgets.QDialog):
     entree_validee = Signal(object)
 
@@ -77,6 +81,10 @@ class FenetreSetUpEntree(QtWidgets.QDialog):
         generer_layout.addWidget(self.bouton_generer)
         formulaire.addRow(generer_layout)
         layout.addLayout(formulaire)
+
+        self.label_indicateur_force= QtWidgets.QLabel("")
+        layout.addWidget(self.label_indicateur_force)
+        self.champ_mot_de_passe.textChanged.connect(self.mettre_a_jour_force)
 
         if entree is not None:
             self.champ_email.setText(entree.email)
@@ -113,6 +121,19 @@ class FenetreSetUpEntree(QtWidgets.QDialog):
         self.entree_validee.emit(entree)
         self.accept()
 
+    def mettre_a_jour_force(self, texte: str) -> None:
+        if len(texte) == 0:
+            self.label_indicateur_force.setText("")
+        elif len(texte) < 8:
+            self.label_indicateur_force.setText("Le mot de passe est faible")
+            self.label_indicateur_force.setStyleSheet("color: red")
+        elif len(texte) < 12:
+            self.label_indicateur_force.setText("Le mot de passe est moyen")
+            self.label_indicateur_force.setStyleSheet("color: orange")
+        else:
+            self.label_indicateur_force.setText("Le mot de passe est fort")
+            self.label_indicateur_force.setStyleSheet("color: green")
+
 class MainFenetre(QtWidgets.QMainWindow):
     def __init__(self, coffre: Coffre):
         super().__init__()
@@ -133,9 +154,15 @@ class MainFenetre(QtWidgets.QMainWindow):
 
         haut_layout = QtWidgets.QHBoxLayout()
         self.bouton_trier = QtWidgets.QPushButton("Trier par e-mail")
+        self.champ_filtrage = QtWidgets.QLineEdit()
+        self.champ_filtrage.setPlaceholderText("Filtrer par e-mail")
         haut_layout.addWidget(self.bouton_trier)
+        haut_layout.addWidget(self.champ_filtrage)
         haut_layout.addStretch()
         layout.addLayout(haut_layout)
+
+        self.label_resultats = QtWidgets.QLabel("")
+        layout.addWidget(self.label_resultats)
 
         layout.addWidget(QtWidgets.QLabel())
 
@@ -160,6 +187,7 @@ class MainFenetre(QtWidgets.QMainWindow):
         self.bouton_ajouter.clicked.connect(self.ajouter)
         self.bouton_modifier.clicked.connect(self.modifier)
         self.bouton_supprimer.clicked.connect(self.supprimer)
+        self.champ_filtrage.textChanged.connect(self.filtrer)
 
     def charger_coffre(self) -> None:
         try:
@@ -192,6 +220,8 @@ class MainFenetre(QtWidgets.QMainWindow):
         self.zone_defilante.setWidget(conteneur)
 
         self.mettre_a_jour_boutons()
+        self.filtrer()
+
 
     def mettre_a_jour_boutons(self) -> None:
         une_selection = self._index_selectionne != -1
@@ -271,6 +301,23 @@ class MainFenetre(QtWidgets.QMainWindow):
                 event.accept()
             else:
                 event.ignore()
+    def filtrer(self) -> None:
+        texte = self.champ_filtrage.text().strip().lower()
+        nombre_visibles = 0
+        for ligne in self._lignes:
+            visible = texte in ligne.email.lower()
+            ligne.setHidden(not visible)
+            if visible:
+                nombre_visibles += 1
+        if texte == "":
+            self.label_resultats.setText("")
+        else:
+            self.label_resultats.setText(f"{nombre_visibles} résultats pour {texte}")
+
+        if self._index_selectionne != -1:
+            email_selectionne = self._lignes[self._index_selectionne].email.lower()
+            if texte not in email_selectionne:
+                self.selectionner(-1)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
