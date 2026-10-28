@@ -3,12 +3,14 @@ from random import randint
 """ Logique de generation de mots de passe """
 
 class PasswordGenerator:
+    """Génère des mots de passe aléatoires selon une longueur et des types de caractères selectionne"""
     MINUSCULES= "abcdefghijklmnopqrstuvwxyz"
     MAJUSCULES = MINUSCULES.upper()
     CHIFFRES = "0123456789"
     SYMBOLES = "!@#$%^&*()-_=+[]{};:,.?/"
 
     def __init__(self, longueur:int=16, avec_minuscules:bool = True, avec_majuscules:bool = True,avec_chiffres:bool = True, avec_symboles:bool = True, valider:bool = False):
+        """Crée un générateur avec les options choisies."""
         self._longueur = None
         self._avec_minuscules = None
         self._avec_majuscules = None

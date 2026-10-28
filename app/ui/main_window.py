@@ -1,3 +1,5 @@
+#Fresnel foguimgang kemloh, 2440103, fresnelkemloh
+
 import sys
 
 from PySide6 import QtWidgets
@@ -7,11 +9,15 @@ from app.core.storage import Coffre, Entree, FichierCoffreInvalideError
 
 from app.ui.generator_ui import FenetreGenerator
 
+"""Fenêtre du coffre-fort"""
+
 class LigneListe(QtWidgets.QWidget):
+    """"Une ligne de la liste ou l'e-mail est à gauche et le mot de passe à droite."""
     clic = Signal(int)
     THEME_COLOR = "background-color:#8cd98c"
 
     def __init__(self, index: int, entree: Entree, parent=None):
+        """Crée la ligne pour une entrée du coffre."""
         super().__init__(parent)
         self._index = index
         self._entree = entree
@@ -27,15 +33,18 @@ class LigneListe(QtWidgets.QWidget):
 
     @property
     def index(self) -> int:
+        """Retourne la position de l'entrée dans le coffre."""
         return self._index
 
     def mettre_a_jour_affichage(self) -> None:
+        """Affiche le mot de passe de facon lisible ou en astérisques selon l'état actuel."""
         if self._visible:
             self.label_mot_de_passe.setText(self._entree.password)
         else:
             self.label_mot_de_passe.setText("*" * len(self._entree.password))
 
     def marquer_selection(self, selectionnee: bool) -> None:
+        """Colore la ligne si elle est sélectionnée sinon retire la couleur."""
         if selectionnee:
             theme = self.THEME_COLOR
         else:
@@ -44,22 +53,27 @@ class LigneListe(QtWidgets.QWidget):
         self.label_mot_de_passe.setStyleSheet(theme)
 
     def mousePressEvent(self, event):
+        """Emet le signal du clic pour sélectionner la ligne avec un clic."""
         self.clic.emit(self._index)
         super().mousePressEvent(event)
 
     def mouseDoubleClickEvent(self, event):
+        """affiche ou masque le mot de passe de cette ligne avec un double clic."""
         self._visible = not self._visible
         self.mettre_a_jour_affichage()
         super().mouseDoubleClickEvent(event)
 
     @property
     def email(self) -> str:
+        """Retourne l'e-mail de la ligne"""
         return self._entree.email
 
 class FenetreSetUpEntree(QtWidgets.QDialog):
+    """Fenetre pour ajouter une entrée ou modifier une entrée existante"""
     entree_validee = Signal(object)
 
     def __init__(self, parent=None, entree: Entree | None = None):
+        """Creer la fenetre"""
         super().__init__(parent)
         if entree is not None:
             self.setWindowTitle("Modifier l'entrée")
@@ -108,11 +122,13 @@ class FenetreSetUpEntree(QtWidgets.QDialog):
         self.bouton_annuler.clicked.connect(self.reject)
 
     def ouvrir_generateur(self) -> None:
+        """ouvre le générateur"""
         dialogue = FenetreGenerator(self)
         dialogue.mot_de_passe_choisi.connect(self.champ_mot_de_passe.setText)
         dialogue.exec()
 
     def valider(self) -> None:
+        """crée l'entrée, l'envoie puis ferme la fenetre"""
         try:
             entree = Entree(self.champ_email.text(), self.champ_mot_de_passe.text())
         except (TypeError, ValueError) as erreur:
@@ -122,6 +138,7 @@ class FenetreSetUpEntree(QtWidgets.QDialog):
         self.accept()
 
     def mettre_a_jour_force(self, texte: str) -> None:
+        """Affiche la force du mot de passe en couleur, selon sa longueur."""
         if len(texte) == 0:
             self.label_indicateur_force.setText("")
         elif len(texte) < 8:
@@ -135,7 +152,9 @@ class FenetreSetUpEntree(QtWidgets.QDialog):
             self.label_indicateur_force.setStyleSheet("color: green")
 
 class MainFenetre(QtWidgets.QMainWindow):
+    """Fenêtre principale du coffre-fort."""
     def __init__(self, coffre: Coffre):
+        """Crée la fenêtre et charge le coffre depuis son fichier JSON"""
         super().__init__()
         self._coffre = coffre
         self._lignes = []
@@ -149,6 +168,7 @@ class MainFenetre(QtWidgets.QMainWindow):
         self.charger_coffre()
 
     def init_ui(self) -> None:
+        """Construit les widgets, les layouts et les connexions des signaux."""
         widget_central = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout()
 
@@ -190,6 +210,7 @@ class MainFenetre(QtWidgets.QMainWindow):
         self.champ_filtrage.textChanged.connect(self.filtrer)
 
     def charger_coffre(self) -> None:
+        """Charge le fichier JSON ; affiche une erreur s'il est corrompu."""
         try:
             self._coffre.charger()
         except FichierCoffreInvalideError as erreur:
@@ -200,6 +221,7 @@ class MainFenetre(QtWidgets.QMainWindow):
         self.rafraichir_liste()
 
     def rafraichir_liste(self) -> None:
+        """Reconstruit la liste défilante à partir des entrées du coffre, puis applique le filtre."""
         conteneur = QtWidgets.QWidget()
         liste_layout = QtWidgets.QVBoxLayout()
         self._lignes = []
@@ -224,32 +246,38 @@ class MainFenetre(QtWidgets.QMainWindow):
 
 
     def mettre_a_jour_boutons(self) -> None:
+        """Active Modifier et Supprimer seulement si une ligne est sélectionnée."""
         une_selection = self._index_selectionne != -1
         self.bouton_modifier.setEnabled(une_selection)
         self.bouton_supprimer.setEnabled(une_selection)
 
     def selectionner(self, index: int) -> None:
+        """Mémorise la ligne cliquée et met à jour les couleurs."""
         self._index_selectionne = index
         for ligne in self._lignes:
             ligne.marquer_selection(ligne.index == index)
         self.mettre_a_jour_boutons()
 
     def trier(self) -> None:
+        """trie le coffre par e-mail en ordre alphabetique"""
         self._coffre.trier_par_mail()
         self._index_selectionne = -1
         self.rafraichir_liste()
 
     def ajouter(self) -> None:
+        """ouvre le dialogue d'ajout."""
         dialogue = FenetreSetUpEntree(self)
         dialogue.entree_validee.connect(self.ajouter_entree)
         dialogue.exec()
 
     def ajouter_entree(self, entree: Entree) -> None:
+        """Reçoit la nouvelle entrée du dialogue et l'ajoute au coffre"""
         self._coffre.add_entree(entree)
         self._index_selectionne = len(self._coffre.entrees) - 1
         self.rafraichir_liste()
 
     def modifier(self) -> None:
+        """ ouvre le dialogue pré-rempli avec l'entrée sélectionnée."""
         if self._index_selectionne == -1:
             return
         entree = self._coffre.entrees[self._index_selectionne]
@@ -258,10 +286,12 @@ class MainFenetre(QtWidgets.QMainWindow):
         dialogue.exec()
 
     def modifier_entree(self, entree: Entree) -> None:
+        """Reçoit l'entrée modifiée et remplace l'ancienne dans le coffre."""
         self._coffre.set_entree(self._index_selectionne, entree)
         self.rafraichir_liste()
 
     def supprimer(self) -> None:
+        """Supprime l'entrée sélectionnée après confirmation."""
         if self._index_selectionne == -1:
             return
         entree = self._coffre.entrees[self._index_selectionne]
@@ -275,6 +305,7 @@ class MainFenetre(QtWidgets.QMainWindow):
             self.rafraichir_liste()
 
     def closeEvent(self, event):
+        """sauvegarde le coffre dans le fichier JSON a la fermeture."""
         if self._fichier_corrompu:
             reponse = QtWidgets.QMessageBox.question(self,
                 "Remplacer le fichier ?",
@@ -302,6 +333,7 @@ class MainFenetre(QtWidgets.QMainWindow):
             else:
                 event.ignore()
     def filtrer(self) -> None:
+        """Masque les lignes dont l'e-mail ne contient pas le texte du filtre"""
         texte = self.champ_filtrage.text().strip().lower()
         nombre_visibles = 0
         for ligne in self._lignes:
@@ -320,6 +352,7 @@ class MainFenetre(QtWidgets.QMainWindow):
                 self.selectionner(-1)
 
 if __name__ == "__main__":
+    #test de la fenetre
     app = QtWidgets.QApplication(sys.argv)
     fenetre = MainFenetre(Coffre("vault.json"))
     fenetre.show()

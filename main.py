@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QApplication
 from app.core.storage import Coffre
 from app.ui.main_window import MainFenetre
 
-"""Configuration CLI"""
+"""Point d'entree du gestionnaire du mots de passe (Mode: cli et graphique)"""
 from app.core.generator import PasswordGenerator
 
 def configurer_cli() -> argparse.ArgumentParser:
@@ -24,6 +24,7 @@ def configurer_cli() -> argparse.ArgumentParser:
     return parser
 
 def demarrer_cli(args) -> None:
+    """génère un mot de passe avec les options reçues et l'affiche en mode CLI."""
     try:
         generateur = PasswordGenerator(
             longueur=args.length,
@@ -38,13 +39,14 @@ def demarrer_cli(args) -> None:
         print(f"Erreur : {e}")
 
 def demarrer_gui(args) -> None:
+    """ouvre la fenêtre du coffre-fort avec le fichier choisi en mode graphique"""
     app = QApplication(sys.argv)
     fenetre = MainFenetre(Coffre(args.vault_file))
     fenetre.show()
     sys.exit(app.exec())
 
 def main():
-    """Point d'entrée du mode CLI"""
+    """Lance le mode CLI ou le mode graphique"""
     parser = configurer_cli()
     args = parser.parse_args()
 

@@ -1,3 +1,5 @@
+#Fresnel foguimgang kemloh, 2440103, fresnelkemloh
+
 import sys
 
 from PySide6.QtCore import Signal, Qt
@@ -6,7 +8,10 @@ from PySide6.QtWidgets import QVBoxLayout, QLabel, QHBoxLayout, QPushButton, QSl
 
 from app.core.generator import PasswordGenerator
 
+"""Fenêtre du générateur de mots de passe"""
+
 class FenetreGenerator(QDialog):
+    """Génère un mot de passe selon la longueur et les types choisis."""
     mot_de_passe_choisi = Signal(str)
 
     LONGUEUR_MIN = 5
@@ -14,6 +19,7 @@ class FenetreGenerator(QDialog):
     LONGUEUR_DEFAUT = 16
 
     def __init__(self, parent=None):
+        """Crée la fenêtre et génère un premier mot de passe"""
         super().__init__(parent)
         self.setWindowTitle("Generateur de mot de passe")
         self.setGeometry(500, 150, 480, 500)
@@ -25,6 +31,7 @@ class FenetreGenerator(QDialog):
         self.generer()
 
     def init_ui(self) -> None:
+        """Construit les widgets, les layouts et les connexions des signaux."""
         layout = QVBoxLayout()
 
         layout.addWidget(QLabel("Longueur"))
@@ -108,19 +115,24 @@ class FenetreGenerator(QDialog):
 
     @property
     def mot_de_passe(self) -> str:
+        """Retourne le dernier mot de passe généré"""
         return self._mot_de_passe
 
     def diminuer_longueur(self) -> None:
+        """Bouton - qui diminue la longueur de 1"""
         self.curseur.setValue(self.curseur.value() - 1)
 
     def augmenter_longueur(self) -> None:
+        """Bouton + qui augmente la longueur de 1"""
         self.curseur.setValue(self.curseur.value() + 1)
 
     def changer_longueur(self, valeur: int) -> None:
+        """Met à jour la longueur affichée, puis génère un nouveau mot de passe."""
         self.label_longueur.setText(str(valeur))
         self.generer()
 
     def generer(self) -> None:
+        """Génère un mot de passe avec PasswordGenerator et les options cochées"""
         try:
             generateur = PasswordGenerator(
                 longueur=self.curseur.value(),
@@ -141,6 +153,7 @@ class FenetreGenerator(QDialog):
         self.mettre_a_jour_affichage()
 
     def mettre_a_jour_affichage(self) -> None:
+        """Affiche le mot de passe de facon lisible ou en astérisques en fonction de l'etat actuel"""
         if self._visible:
             self.champ_mot_de_passe.setText(self._mot_de_passe)
             self.bouton_afficher.setText("Masquer")
@@ -149,18 +162,22 @@ class FenetreGenerator(QDialog):
             self.bouton_afficher.setText("Afficher")
 
     def basculer_affichage(self) -> None:
+        """Bouton Afficher / Masquer qui inverse l'état d'affichage du mot de passe."""
         self._visible = not self._visible
         self.mettre_a_jour_affichage()
 
     def copier(self) -> None:
+        """Bouton qui copie le mot de passe"""
         QApplication.clipboard().setText(self._mot_de_passe)
         self.label_message.setText("Mot de passe copié.")
 
     def utiliser(self) -> None:
+        """envoie le mot de passe à la fenêtre parente, puis ferme."""
         self.mot_de_passe_choisi.emit(self._mot_de_passe)
         self.accept()
 
 if __name__ == "__main__":
+    #pour lancer la fenetre seul
         app = QApplication(sys.argv)
         window = FenetreGenerator()
         window.show()
